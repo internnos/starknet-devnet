@@ -26,7 +26,7 @@ def test_call(deploy_info):
 
     assert isinstance(result["result"], list)
     assert len(result["result"]) == 1
-    assert result["result"][0] == "0x0"
+    assert result["result"][0] == "0x45"
 
 
 # pylint: disable=unused-argument
@@ -80,7 +80,7 @@ def test_call_raises_on_invalid_calldata(deploy_info):
         "starknet_call", params={
             "contract_address": contract_address,
             "entry_point_selector": hex(get_selector_from_name("get_balance")),
-            "calldata": ["a", "b", "123"],
+            "calldata": ["4567"],
             "block_hash": "latest"
         }
     )

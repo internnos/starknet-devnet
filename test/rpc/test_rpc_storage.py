@@ -25,7 +25,7 @@ def test_get_storage_at(deploy_info):
     )
     storage = resp["result"]
 
-    assert storage == "0x0"
+    assert storage == "0x45"
 
 
 # pylint: disable=unused-argument

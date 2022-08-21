@@ -96,7 +96,7 @@ def test_get_block_by_hash_full_txn_scope(deploy_info):
         "txn_hash": transaction_hash,
         "max_fee": "0x0",
         "contract_address": contract_address,
-        "calldata": [],
+        "calldata": ["0x045"],
         "entry_point_selector": None,
         "signature": [],
         "version": "0x0"
@@ -125,7 +125,7 @@ def test_get_block_by_hash_full_txn_and_receipts_scope(deploy_info):
         "txn_hash": transaction_hash,
         "max_fee": "0x0",
         "contract_address": contract_address,
-        "calldata": [],
+        "calldata": ["0x045"],
         "entry_point_selector": None,
         "signature": [],
         "version": "0x0",

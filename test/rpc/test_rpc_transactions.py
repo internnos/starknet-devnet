@@ -29,7 +29,7 @@ def test_get_transaction_by_hash_deploy(deploy_info):
         "txn_hash": pad_zero(transaction_hash),
         "contract_address": contract_address,
         "max_fee": "0x0",
-        "calldata": [],
+        "calldata": ["0x045"],
         "entry_point_selector": None,
         "signature": [],
         "version": "0x0"
@@ -137,7 +137,7 @@ def test_get_transaction_by_block_hash_and_index(deploy_info):
         "txn_hash": pad_zero(transaction_hash),
         "contract_address": contract_address,
         "max_fee": "0x0",
-        "calldata": [],
+        "calldata": ["0x045"],
         "entry_point_selector": None,
         "signature": [],
         "version": "0x0"
@@ -203,7 +203,7 @@ def test_get_transaction_by_block_number_and_index(deploy_info):
         "txn_hash": pad_zero(transaction_hash),
         "contract_address": contract_address,
         "max_fee": "0x0",
-        "calldata": [],
+        "calldata": ["0x045"],
         "entry_point_selector": None,
         "signature": [],
         "version": "0x0"
@@ -405,7 +405,7 @@ def test_add_deploy_transaction_on_incorrect_contract(deploy_content):
     """
     contract_definition = deploy_content["contract_definition"]
     salt = deploy_content["contract_address_salt"]
-    calldata = [hex(data) for data in deploy_content["constructor_calldata"]]
+    calldata = [hex(int(data)) for data in deploy_content["constructor_calldata"]]
 
     rpc_contract = RpcContractClass(
         program="",
@@ -433,7 +433,7 @@ def test_add_deploy_transaction(deploy_content):
     """
     contract_definition = deploy_content["contract_definition"]
     salt = deploy_content["contract_address_salt"]
-    calldata = [hex(data) for data in deploy_content["constructor_calldata"]]
+    calldata = [hex(int(data)) for data in deploy_content["constructor_calldata"]]
 
     rpc_contract = RpcContractClass(
         program=contract_definition["program"],
