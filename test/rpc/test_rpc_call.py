@@ -27,7 +27,7 @@ def test_call(deploy_info):
     )
     result = resp["result"]
 
-    assert result["result"] == ["0x00"]
+    assert result["result"] == ["0x045"]
 
 
 @pytest.mark.usefixtures("run_devnet_in_background", "deploy_info")
@@ -88,15 +88,15 @@ def test_call_raises_on_invalid_calldata(deploy_info):
             "request": {
                 "contract_address": pad_zero(contract_address),
                 "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": ["a", "b", "123"],
+                "calldata": ["0x00123"],
             },
             "block_id": "latest"
         }
     )
 
     assert ex["error"] == {
-        "code": 22,
-        "message": "Invalid call data"
+        "code": -1,
+        "message": "Error at pc=0:118:\nAn ASSERT_EQ instruction failed: 10:0 != 10:1."
     }
 
 
