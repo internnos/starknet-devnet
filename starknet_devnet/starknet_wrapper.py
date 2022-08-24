@@ -95,7 +95,7 @@ class StarknetWrapper:
         state_update = await self.__update_state()
         state = self.get_state()
         state_root = self.__get_state_root()
-        return self.blocks.generate_empty(state, state_root, state_update)
+        return self.blocks.generate(state, state_root, state_update, is_empty=True)
 
     async def __preserve_current_state(self, state: CarriedState):
         self.__current_carried_state = deepcopy(state)
