@@ -1,6 +1,6 @@
-"""
-Tests RPC rpc_call
-"""
+# """
+# Tests RPC rpc_call
+# """
 
 import pytest
 from starkware.starknet.public.abi import get_selector_from_name
@@ -77,7 +77,7 @@ def test_call_raises_on_incorrect_selector(deploy_info):
 
 
 @pytest.mark.usefixtures("run_devnet_in_background")
-def test_call_raises_on_invalid_calldata(deploy_info):
+def test_call_raises_on_invalid_calldata_datatype_not_str(deploy_info):
     """
     Call contract with incorrect calldata
     """
@@ -88,12 +88,39 @@ def test_call_raises_on_invalid_calldata(deploy_info):
             "request": {
                 "contract_address": pad_zero(contract_address),
                 "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": ["0x00123"],
+                "calldata": [12],
             },
             "block_id": "latest"
         }
     )
 
+    assert ex["error"] == {
+        "code": 22,
+        "message": "Invalid call data"
+    }
+
+
+@pytest.mark.usefixtures("run_devnet_in_background")
+def test_call_raises_on_invalid_calldata_datatype_calldata_should_be_empty(deploy_info):
+    """
+    Call contract with incorrect calldata
+    """
+    contract_address: str = deploy_info["address"]
+
+    ex = rpc_call(
+        "starknet_call", params={
+            "request": {
+                "contract_address": pad_zero(contract_address),
+                "entry_point_selector": hex(get_selector_from_name("get_balance")),
+                "calldata": ["12"],
+            },
+            "block_id": "latest"
+        }
+    )
+
+    # This should be 22, Invalid call data
+    # But since we call the starknet API, we cannot know the exact error code,
+    # We can only know that this is considered as TransactionError
     assert ex["error"] == {
         "code": -1,
         "message": "Error at pc=0:118:\nAn ASSERT_EQ instruction failed: 10:0 != 10:1."

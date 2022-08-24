@@ -23,6 +23,9 @@ async def call(request: FunctionCall, block_id: BlockId) -> List[Felt]:
         raise RpcError(code=20, message="Contract not found")
 
     try:
+        for calldata in request["calldata"]:
+            if not isinstance(calldata, str):
+                raise RpcError(code=22, message="Invalid call data")
         result = await state.starknet_wrapper.call(transaction=make_invoke_function(request))
         result["result"] = [rpc_felt(int(res, 16)) for res in result["result"]]
         return result
