@@ -57,7 +57,7 @@ def test_get_transaction_by_hash_deploy(deploy_info):
         "type": rpc_txn_type(block_tx["type"]),
         "contract_address": pad_zero(contract_address),
         "contract_address_salt": pad_zero(block_tx["contract_address_salt"]),
-        "constructor_calldata": ['0x045'],
+        "constructor_calldata": ["0x045"],
     }
 
 
