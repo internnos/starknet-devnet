@@ -99,7 +99,6 @@ class DevnetBlocks():
         """
         block_number = self.get_number_of_blocks()
         timestamp = state.state.block_info.block_timestamp
-        
         if block_number == 0:
             parent_block_hash = 0
         else:
@@ -111,7 +110,6 @@ class DevnetBlocks():
             transactions = []
             block_hash = block_number
         else:
-           
             if self.lite:
                 block_hash = block_number
             else:
@@ -130,7 +128,6 @@ class DevnetBlocks():
 
             transaction_receipts = (transaction.get_execution(),)
             transactions=[transaction.internal_tx]
-                
         block = StarknetBlock.create(
             block_hash=block_hash,
             block_number=block_number,
@@ -157,5 +154,5 @@ class DevnetBlocks():
             )
 
         self.__state_updates[block_number] = state_update
-
         return block
+        

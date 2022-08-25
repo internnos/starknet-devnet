@@ -160,7 +160,6 @@ class StarknetWrapper:
         Stores the provided data as a deploy transaction in `self.transactions`.
         Generates a new block
         """
-        
         if transaction.status == TransactionStatus.REJECTED:
             assert error_message, "error_message must be present if tx rejected"
             transaction.set_failure_reason(error_message)
@@ -424,3 +423,4 @@ class StarknetWrapper:
     def set_gas_price(self, gas_price: int):
         """Sets gas price to `gas_price`."""
         self.block_info_generator.set_gas_price(gas_price)
+        
