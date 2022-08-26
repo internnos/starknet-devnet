@@ -155,4 +155,3 @@ class DevnetBlocks():
 
         self.__state_updates[block_number] = state_update
         return block
-        

@@ -284,8 +284,6 @@ class StarknetWrapper:
             transaction_hash=tx_hash,
         )
 
-
-
         await self.__store_transaction(
             transaction=transaction,
             state_update=state_update,
@@ -423,4 +421,3 @@ class StarknetWrapper:
     def set_gas_price(self, gas_price: int):
         """Sets gas price to `gas_price`."""
         self.block_info_generator.set_gas_price(gas_price)
-        
