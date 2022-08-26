@@ -90,13 +90,14 @@ class DevnetBlocks():
 
     async def generate(
         self, transaction: DevnetTransaction, state: StarknetState,
-        state_root: bytes, state_update = None, is_empty_block = False
+        state_update = None, is_empty_block = False
     ) -> StarknetBlock:
         """
         Generates a block and stores it to blocks and hash2block. The block contains just the passed transaction.
         The `tx_wrapper.transaction` dict should contain a key `transaction`.
         Returns (block_hash, block_number).
         """
+        state_root = state.state.shared_state.contract_states.root
         block_number = self.get_number_of_blocks()
         timestamp = state.state.block_info.block_timestamp
         if block_number == 0:
