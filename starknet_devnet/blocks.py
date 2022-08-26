@@ -109,6 +109,12 @@ class DevnetBlocks():
             transaction_receipts = ()
             transactions = []
         else:
+            transaction_receipts = (transaction.get_execution(),)
+            transactions=[transaction.internal_tx]
+            
+        if self.lite or is_empty_block:
+            block_hash = block_number
+        else:
             signature = transaction.get_signature()
             block_hash = await calculate_block_hash(
             general_config=state.general_config,
@@ -121,10 +127,6 @@ class DevnetBlocks():
             event_hashes=[],
             sequencer_address=state.general_config.sequencer_address
             )
-            transaction_receipts = (transaction.get_execution(),)
-            transactions=[transaction.internal_tx]
-        if self.lite or is_empty_block:
-            block_hash = block_number
 
         block = StarknetBlock.create(
             block_hash=block_hash,
