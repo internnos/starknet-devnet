@@ -111,7 +111,7 @@ class DevnetBlocks():
         else:
             transaction_receipts = (transaction.get_execution(),)
             transactions=[transaction.internal_tx]
-            
+
         if self.lite or is_empty_block:
             block_hash = block_number
         else:
