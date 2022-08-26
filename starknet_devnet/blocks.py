@@ -117,15 +117,15 @@ class DevnetBlocks():
         else:
             signature = transaction.get_signature()
             block_hash = await calculate_block_hash(
-            general_config=state.general_config,
-            parent_hash=parent_block_hash,
-            block_number=block_number,
-            global_state_root=state_root,
-            block_timestamp=timestamp,
-            tx_hashes=[transaction.internal_tx.hash_value],
-            tx_signatures=[signature],
-            event_hashes=[],
-            sequencer_address=state.general_config.sequencer_address
+                general_config=state.general_config,
+                parent_hash=parent_block_hash,
+                block_number=block_number,
+                global_state_root=state_root,
+                block_timestamp=timestamp,
+                tx_hashes=[transaction.internal_tx.hash_value],
+                tx_signatures=[signature],
+                event_hashes=[],
+                sequencer_address=state.general_config.sequencer_address
             )
 
         block = StarknetBlock.create(
