@@ -121,7 +121,6 @@ The latest stable version is also available as:
 
 - `shardlabs/starknet-devnet:latest`
 
-
 Commits to the `master` branch of this repository are mostly available as images tagged with their commit hash (the full 40-hex-digits SHA1 digest):
 
 - `shardlabs/starknet-devnet:<COMMIT_HASH>`
