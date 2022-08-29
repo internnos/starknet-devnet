@@ -95,7 +95,7 @@ def test_call_raises_on_invalid_calldata(deploy_info, calldata):
             "block_id": "latest"
         }
     )
-    
+
     assert ex["error"] == {
         "code": 22,
         "message": "Invalid calldata"
