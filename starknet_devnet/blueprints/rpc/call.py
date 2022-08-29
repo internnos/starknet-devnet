@@ -27,13 +27,8 @@ async def call(request: FunctionCall, block_id: BlockId) -> List[Felt]:
     for calldata_value in request["calldata"]:
         try:
             rpc_felt(int(calldata_value, 16))
-<<<<<<< HEAD
         except (ValueError, TypeError) as error:
             raise RpcError(code=22, message="Invalid calldata") from error
-=======
-        except (ValueError, TypeError):
-            raise RpcError(code=22, message="Invalid calldata") from None
->>>>>>> 79e99b9 (refactor: exception handling for invalid calldata)
     try:
         result = await state.starknet_wrapper.call(transaction=make_invoke_function(request))
         result["result"] = [rpc_felt(int(res, 16)) for res in result["result"]]
