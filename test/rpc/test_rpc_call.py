@@ -1,120 +1,45 @@
 """
-Tests RPC rpc_call
+RPC call endpoint
 """
 
-import pytest
-from starkware.starknet.public.abi import get_selector_from_name
+from typing import List
 
-from .rpc_utils import rpc_call, pad_zero
+from starkware.starkware_utils.error_handling import StarkException
+
+from starknet_devnet.blueprints.rpc.utils import rpc_felt, assert_block_id_is_latest
+from starknet_devnet.blueprints.rpc.structures.payloads import make_invoke_function, FunctionCall
+from starknet_devnet.blueprints.rpc.structures.types import Felt, BlockId, RpcError
+from starknet_devnet.state import state
+from starknet_devnet.util import StarknetDevnetException
 
 
-@pytest.mark.usefixtures("run_devnet_in_background")
-def test_call(deploy_info):
+async def call(request: FunctionCall, block_id: BlockId) -> List[Felt]:
     """
-    Call contract
+    Call a starknet function without creating a StarkNet transaction
     """
-    contract_address: str = deploy_info["address"]
+    assert_block_id_is_latest(block_id)
 
-    resp = rpc_call(
-        "starknet_call",
-        params={
-            "request": {
-                "contract_address": pad_zero(contract_address),
-                "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": [],
-            },
-            "block_id": "latest",
-        },
-    )
-    result = resp["result"]
+    if not state.starknet_wrapper.contracts.is_deployed(int(request["contract_address"], 16)):
+        raise RpcError(code=20, message="Contract not found")
 
-    assert result["result"] == ["0x00"]
-
-
-@pytest.mark.usefixtures("run_devnet_in_background", "deploy_info")
-def test_call_raises_on_incorrect_contract_address():
-    """
-    Call contract with incorrect address
-    """
-    ex = rpc_call(
-        "starknet_call",
-        params={
-            "request": {
-                "contract_address": "0x07b529269b82f3f3ebbb2c463a9e1edaa2c6eea8fa308ff70b30398766a2e20c",
-                "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": [],
-            },
-            "block_id": "latest",
-        },
-    )
-
-    assert ex["error"] == {"code": 20, "message": "Contract not found"}
-
-
-@pytest.mark.usefixtures("run_devnet_in_background")
-def test_call_raises_on_incorrect_selector(deploy_info):
-    """
-    Call contract with incorrect entry point selector
-    """
-    contract_address: str = deploy_info["address"]
-
-    ex = rpc_call(
-        "starknet_call",
-        params={
-            "request": {
-                "contract_address": pad_zero(contract_address),
-                "entry_point_selector": hex(get_selector_from_name("xxxxxxx")),
-                "calldata": [],
-            },
-            "block_id": "latest",
-        },
-    )
-
-    assert ex["error"] == {"code": 21, "message": "Invalid message selector"}
-
-
-@pytest.mark.usefixtures("run_devnet_in_background")
-def test_call_raises_on_invalid_calldata(deploy_info):
-    """
-    Call contract with incorrect calldata
-    """
-    contract_address: str = deploy_info["address"]
-
-    ex = rpc_call(
-        "starknet_call",
-        params={
-            "request": {
-                "contract_address": pad_zero(contract_address),
-                "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": ["a", "b", "123"],
-            },
-            "block_id": "latest",
-        },
-    )
-
-    assert ex["error"] == {"code": 22, "message": "Invalid call data"}
-
-
-@pytest.mark.usefixtures("run_devnet_in_background")
-def test_call_raises_on_incorrect_block_hash(deploy_info):
-    """
-    Call contract with incorrect block hash
-    """
-    contract_address: str = deploy_info["address"]
-
-    ex = rpc_call(
-        "starknet_call",
-        params={
-            "request": {
-                "contract_address": pad_zero(contract_address),
-                "entry_point_selector": hex(get_selector_from_name("get_balance")),
-                "calldata": [],
-            },
-            "block_id": "0x0",
-        },
-    )
-
-    assert ex["error"] == {
-        "code": -1,
-        "message": "Calls with block_id != 'latest' are not supported currently.",
-    }
+    # exception handling using [rpc_felt(int(calldata_value, 1)) for calldata_value in request["calldata"]]
+    # does not work properly, so we use the following workaround
+    for calldata_value in request["calldata"]:
+        try:
+            rpc_felt(int(calldata_value, 16))
+        except (ValueError, TypeError) as error:
+            raise RpcError(code=22, message="Invalid calldata") from error
+    try:
+        result = await state.starknet_wrapper.call(transaction=make_invoke_function(request))
+        result["result"] = [rpc_felt(int(res, 16)) for res in result["result"]]
+        return result
+    except StarknetDevnetException as ex:
+        raise RpcError(code=-1, message=ex.message) from ex
+    except StarkException as ex:
+        if ex.code.name == "TRANSACTION_FAILED" and ex.code.value == 39:
+            raise RpcError(code=22, message="Invalid calldata") from ex
+        if f"Entry point {request['entry_point_selector']} not found" in ex.message:
+            raise RpcError(code=21, message="Invalid message selector") from ex
+        if "While handling calldata" in ex.message:
+            raise RpcError(code=22, message="Invalid call data") from ex
+        raise RpcError(code=-1, message=ex.message) from ex
